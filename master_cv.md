@@ -32,12 +32,14 @@ Hamburg, Germany | ashutoshgorji@gmail.com | +49 176 85632348 | [linkedin.com/in
 
 - Planned and oversaw in-house production to meet customer delivery deadlines, including laser cutting, sheet metal work and fabrication
 - Identified and qualified job-work partners for processes not available in-house and coordinated their outsourced production
+- Compared in-house production costs against job-work quotes before outsourcing to choose the more cost-effective option
 - Coordinated vendors and material requirements for prototype production and final assembly for client delivery
 
 ### Quality Control Engineer | ArcelorMittal Nippon Steel India, Surat, India | 01.2021 to 07.2021
 
 - Coordinated inspection and production activities with internal teams and the client's third-party inspector to keep deliveries on schedule
 - Prepared production and shift reports to track output and support delivery planning
+- Tracked production figures against targets in shift reports
 - Traced recurring quality issues to their root causes with other teams to protect material flow and supply continuity
 - Managed a team of eight to ten people by delegating tasks across departments to keep production flowing
 
@@ -52,6 +54,7 @@ Hamburg, Germany | ashutoshgorji@gmail.com | +49 176 85632348 | [linkedin.com/in
 
 - Oversaw supply management for production operations, ensuring materials were available to keep the line running
 - Prepared production reports for all three shifts to track output and support material planning
+- Tracked production output against targets across all three shifts
 - Coordinated day-to-day operations across shifts to keep production and material flow on schedule
 - Acted as junior supervisor for material and production coordination across the department
 
