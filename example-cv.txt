@@ -1,0 +1,32 @@
+// Example CV. Lines starting with // are ignored.
+// Format: # name, "key: value" contact lines, ## section, ### date | title | place, - bullet, **bold**, *italic*, left || right
+# Alex Example Muster
+email: alex.muster@example.com
+phone: +49 170 0000000
+location: Hamburg, Germany
+linkedin: linkedin.com/in/alex-muster
+birthday: 01.01.1995
+// photo: photo.jpg
+
+## Skills
+**SAP / ERP:** SAP S/4HANA, production orders, BOMs and routings, MRP, goods receipts and issues, master data
+**Supply chain planning:** production planning and scheduling, delivery-date management, material availability planning
+**Tools:** Excel, Power BI, SQL
+
+## Experience
+### 03.2024 – Present | Supply Chain Planner | Example Industries GmbH, Hamburg, Germany
+Responsible for two production lines
+- Planned and scheduled production orders to meet customer delivery dates
+- Built Power BI reports to track material availability and supplier delays
+- Cleaned up material master data in SAP before a system migration
+
+### 08.2020 – 02.2024 | Production Engineer | Sample Manufacturing Ltd., India
+- Reduced production waste by 15% with lean management practices
+- Coordinated vendors and material requirements for prototype builds
+
+## Education
+### 10.2018 – 07.2020 | M.Sc. Industrial Engineering | Example University of Applied Sciences, Germany
+### 06.2014 – 05.2018 | Bachelor of Engineering, Mechanical Engineering | Sample Technological University, India
+
+## Languages
+**English** - Business Fluent (C1) || **German** - Fluent (B1)

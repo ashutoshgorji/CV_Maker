@@ -1,0 +1,58 @@
+/* Resume layout, modelled on the FlowCV "PT Serif" template. Sizes are in pt so they map 1:1 to the PDF. */
+@import url("fonts/fonts.css");
+
+@page { size: A4; margin: 10mm; }
+
+.cv {
+  --text: #000;
+  --rule: #000;
+  --date-col: 118.5pt;
+  box-sizing: border-box;
+  width: 210mm;
+  min-height: 297mm;
+  padding: 10mm;
+  background: #fff;
+  color: var(--text);
+  font-family: "PT Serif", Georgia, "Times New Roman", serif;
+  font-size: 10pt;
+  line-height: 1.125;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.cv * { box-sizing: border-box; }
+.cv p, .cv ul, .cv h1, .cv h2 { margin: 0; padding: 0; }
+.cv b { font-weight: 700; }
+
+/* Header */
+.cv-header { display: flex; align-items: flex-start; gap: 16pt; margin-bottom: 9pt; }
+.cv-head-text { flex: 1; min-width: 0; padding-top: 2.3pt; }
+.cv h1 { font-size: 15pt; line-height: 1.33; font-weight: 700; margin-bottom: 4pt; }
+.contacts { display: flex; flex-wrap: wrap; column-gap: 15pt; row-gap: 6.25pt; }
+.contact { display: inline-flex; align-items: center; gap: 5pt; white-space: nowrap; }
+.contact svg { width: 9.5pt; height: 9.5pt; fill: currentColor; flex: none; }
+.photo { width: 75pt; height: 75pt; border-radius: 50%; object-fit: cover; flex: none; margin-top: 4pt; }
+
+/* Sections */
+.cv section { margin-top: 8.5pt; }
+.cv-header + section { margin-top: 0; }
+.cv h2 {
+  font-size: 11pt;
+  line-height: 1.3;
+  font-weight: 700;
+  text-transform: uppercase;
+  border-bottom: 0.75pt solid var(--rule);
+  margin-bottom: 4.5pt;
+  break-after: avoid;
+}
+.block > p + p, .block > p + .cols, .block > .cols + p, .block > .cols + .cols { margin-top: 5.25pt; }
+
+.entry { display: grid; grid-template-columns: var(--date-col) 1fr; break-inside: avoid; }
+.entry + .entry, .block + .entry, .entry + .block { margin-top: 6pt; }
+.entry .date { white-space: nowrap; padding-right: 8pt; }
+.entry .body p + p, .entry .body ul + p { margin-top: 1pt; }
+
+.cv ul { list-style: none; }
+.cv li { position: relative; padding-left: 9pt; text-align: justify; }
+.cv li::before { content: "•"; position: absolute; left: 1.5pt; }
+
+.cols { display: grid; grid-template-columns: 1fr 1fr; column-gap: 20pt; }

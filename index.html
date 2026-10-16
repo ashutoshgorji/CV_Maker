@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CV Maker</title>
+<link rel="stylesheet" href="cv.css">
+<style>
+  :root {
+    --bg: #eef0f3; --panel: #fff; --ink: #1d2330; --muted: #667085; --line: #d6dae1;
+    --accent: #1f5eff; --accent-ink: #fff; --code-bg: #fbfbfc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #15181e; --panel: #1e222a; --ink: #e6e8ec; --muted: #9aa3b2; --line: #343a46;
+            --accent: #6d9bff; --accent-ink: #0b1020; --code-bg: #171a20; }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--bg); color: var(--ink); font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+
+  .app { display: grid; grid-template-columns: minmax(340px, 42%) 1fr; height: 100vh; }
+  .editor { display: flex; flex-direction: column; background: var(--panel); border-right: 1px solid var(--line); min-width: 0; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; border-bottom: 1px solid var(--line); align-items: center; }
+  .toolbar .spacer { flex: 1; }
+  button, .btn {
+    font: inherit; border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+    padding: 6px 10px; border-radius: 6px; cursor: pointer; white-space: nowrap;
+  }
+  button:hover, .btn:hover { border-color: var(--muted); }
+  button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+  textarea {
+    flex: 1; width: 100%; resize: none; border: 0; outline: 0; padding: 14px;
+    background: var(--code-bg); color: var(--ink); tab-size: 2;
+    font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  .status { padding: 6px 12px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); }
+  .help { display: none; padding: 10px 14px; border-bottom: 1px solid var(--line); font-size: 13px; max-height: 45vh; overflow: auto; }
+  .help.open { display: block; }
+  .help table { border-collapse: collapse; width: 100%; }
+  .help td { padding: 3px 6px; vertical-align: top; border-bottom: 1px solid var(--line); }
+  .help code { font: 12px ui-monospace, Menlo, Consolas, monospace; white-space: pre-wrap; }
+  .help p { margin: 8px 0 0; color: var(--muted); }
+
+  .preview { overflow: auto; padding: 24px; }
+  .sheet-wrap { position: relative; margin: 0 auto; width: fit-content; transform-origin: top left; }
+  .sheet-wrap .cv { box-shadow: 0 2px 12px rgba(0,0,0,.18); }
+  .page-break {
+    position: absolute; left: -12px; right: -12px; border-top: 1px dashed #e5484d; pointer-events: none;
+  }
+  .page-break span { position: absolute; right: 0; top: -9px; font: 11px system-ui, sans-serif; color: #e5484d; background: var(--bg); padding: 0 4px; }
+  input[type=file] { display: none; }
+
+  @media (max-width: 800px) {
+    .app { grid-template-columns: 1fr; grid-template-rows: 55vh auto; height: auto; }
+    .editor { height: 55vh; }
+    .preview { padding: 12px; }
+  }
+
+  @media print {
+    body { background: #fff; }
+    .editor, .page-break { display: none !important; }
+    .app { display: block; height: auto; }
+    .preview { padding: 0; overflow: visible; }
+    .sheet-wrap { transform: none !important; width: auto !important; height: auto !important; margin: 0 !important; }
+    .sheet-wrap .cv { box-shadow: none; width: auto; min-height: 0; padding: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="editor">
+    <div class="toolbar">
+      <button class="primary" id="pdf" title="Opens the print dialog: choose “Save as PDF”">Download PDF</button>
+      <button id="copy" title="Copy all text">Copy text</button>
+      <button id="paste" title="Replace everything with the clipboard">Paste all</button>
+      <label class="btn" title="Open a .txt file">Open<input type="file" id="open" accept=".txt,text/plain"></label>
+      <button id="save" title="Save the text as a .txt file">Save .txt</button>
+      <label class="btn" title="Add or change the photo">Photo<input type="file" id="photo" accept="image/*"></label>
+      <button id="nophoto" title="Remove the photo">No photo</button>
+      <span class="spacer"></span>
+      <button id="helpbtn">Format help</button>
+      <button id="example" title="Replace the text with the example">Example</button>
+    </div>
+    <div class="help" id="help">
+      <table>
+        <tr><td><code># Full Name</code></td><td>Your name at the top</td></tr>
+        <tr><td><code>email: …</code> <code>phone: …</code> <code>location: …</code> <code>linkedin: …</code> <code>birthday: …</code> <code>website: …</code></td><td>Contact lines (before the first section) – shown with icons</td></tr>
+        <tr><td><code>## Experience</code></td><td>New section</td></tr>
+        <tr><td><code>### 05.2026 – Present | Job title | Company, City</code></td><td>Entry: date | title | place (place is optional)</td></tr>
+        <tr><td><code>- did something</code></td><td>Bullet point</td></tr>
+        <tr><td><code>**SAP / ERP:** text</code></td><td><b>bold</b> (and <code>*italic*</code>)</td></tr>
+        <tr><td><code>left || right</code></td><td>Two columns (e.g. languages)</td></tr>
+        <tr><td><code>// note</code></td><td>Ignored line</td></tr>
+      </table>
+      <p>Your text and photo are saved automatically in this browser. For the PDF: click <b>Download PDF</b>, pick <b>Save as PDF</b>, and turn off “Headers and footers”. Red dashed lines in the preview show where pages roughly break.</p>
+    </div>
+    <textarea id="text" spellcheck="true" aria-label="CV text"></textarea>
+    <div class="status" id="status">Ready</div>
+  </div>
+  <div class="preview" id="preview"><div class="sheet-wrap" id="sheet"></div></div>
+</div>
+
+<script type="text/plain" id="example-text">// Example CV. Lines starting with // are ignored.
+// Format: # name, "key: value" contact lines, ## section, ### date | title | place, - bullet, **bold**, *italic*, left || right
+# Alex Example Muster
+email: alex.muster@example.com
+phone: +49 170 0000000
+location: Hamburg, Germany
+linkedin: linkedin.com/in/alex-muster
+birthday: 01.01.1995
+
+## Skills
+**SAP / ERP:** SAP S/4HANA, production orders, BOMs and routings, MRP, goods receipts and issues, master data
+**Supply chain planning:** production planning and scheduling, delivery-date management, material availability planning
+**Tools:** Excel, Power BI, SQL
+
+## Experience
+### 03.2024 – Present | Supply Chain Planner | Example Industries GmbH, Hamburg, Germany
+Responsible for two production lines
+- Planned and scheduled production orders to meet customer delivery dates
+- Built Power BI reports to track material availability and supplier delays
+- Cleaned up material master data in SAP before a system migration
+
+### 08.2020 – 02.2024 | Production Engineer | Sample Manufacturing Ltd., India
+- Reduced production waste by 15% with lean management practices
+- Coordinated vendors and material requirements for prototype builds
+
+## Education
+### 10.2018 – 07.2020 | M.Sc. Industrial Engineering | Example University of Applied Sciences, Germany
+### 06.2014 – 05.2018 | Bachelor of Engineering, Mechanical Engineering | Sample Technological University, India
+
+## Languages
+**English** - Business Fluent (C1) || **German** - Fluent (B1)
+</script>
+<script src="cv.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var text = $('text'), sheet = $('sheet'), preview = $('preview'), status = $('status');
+  var KEY_TEXT = 'cvmaker.text', KEY_PHOTO = 'cvmaker.photo';
+  var photo = '';
+
+  function store(key, value) {
+    try { value ? localStorage.setItem(key, value) : localStorage.removeItem(key); return true; }
+    catch (e) { return false; }
+  }
+  function load(key) { try { return localStorage.getItem(key) || ''; } catch (e) { return ''; } }
+  function say(msg) { status.textContent = msg; }
+
+  var MM = 96 / 25.4; // CSS px per mm
+  function drawPageBreaks() {
+    sheet.querySelectorAll('.page-break').forEach(function (el) { el.remove(); });
+    var cv = sheet.querySelector('.cv');
+    var contentPerPage = 277 * MM; // A4 height minus 10mm top/bottom margins
+    var pages = Math.ceil((cv.offsetHeight - 20 * MM) / contentPerPage);
+    for (var p = 1; p < pages; p++) {
+      var line = document.createElement('div');
+      line.className = 'page-break';
+      line.style.top = (10 * MM + p * contentPerPage) + 'px';
+      line.innerHTML = '<span>page ' + (p + 1) + '</span>';
+      sheet.appendChild(line);
+    }
+    return Math.max(pages, 1);
+  }
+
+  function fit() {
+    var cv = sheet.querySelector('.cv');
+    if (!cv) return;
+    var avail = preview.clientWidth - 48;
+    var scale = Math.min(1, avail / cv.offsetWidth);
+    sheet.style.transform = 'scale(' + scale + ')';
+    sheet.style.height = (cv.offsetHeight * scale) + 'px';
+    sheet.style.width = cv.offsetWidth + 'px';
+    sheet.style.marginLeft = Math.max(0, (avail - cv.offsetWidth * scale) / 2) + 'px';
+  }
+
+  var saveTimer;
+  function update() {
+    sheet.innerHTML = CV.render(text.value, { photo: photo });
+    var name = CV.parse(text.value).name.replace(/[*]/g, '').trim();
+    document.title = name ? name + ' CV' : 'CV Maker';
+    var pages = drawPageBreaks();
+    fit();
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function () {
+      var ok = store(KEY_TEXT, text.value);
+      say((ok ? 'Saved in this browser' : 'Not saved (browser storage blocked) – use “Save .txt”') + ' · ' + pages + (pages === 1 ? ' page' : ' pages'));
+    }, 400);
+  }
+
+  function setText(value) { text.value = value; update(); }
+  function readFile(file, asDataUrl, cb) {
+    var r = new FileReader();
+    r.onload = function () { cb(r.result); };
+    asDataUrl ? r.readAsDataURL(file) : r.readAsText(file);
+  }
+
+  // Shrink large photos so they fit in browser storage.
+  function setPhoto(dataUrl) {
+    var img = new Image();
+    img.onload = function () {
+      var size = 600, c = document.createElement('canvas');
+      var s = Math.min(img.width, img.height);
+      c.width = c.height = Math.min(size, s);
+      c.getContext('2d').drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, c.width, c.height);
+      photo = c.toDataURL('image/jpeg', 0.9);
+      store(KEY_PHOTO, photo) || say('Photo not saved in this browser (storage blocked)');
+      update();
+    };
+    img.src = dataUrl;
+  }
+
+  text.addEventListener('input', update);
+  window.addEventListener('resize', fit);
+
+  $('pdf').onclick = function () { window.print(); };
+  $('copy').onclick = function () {
+    navigator.clipboard.writeText(text.value).then(function () { say('Copied all text'); },
+      function () { text.select(); document.execCommand('copy'); say('Copied all text'); });
+  };
+  $('paste').onclick = function () {
+    if (!navigator.clipboard || !navigator.clipboard.readText) { text.select(); say('Press Ctrl+V / Cmd+V to replace the selected text'); return; }
+    navigator.clipboard.readText().then(function (t) {
+      if (t.trim()) { setText(t); say('Pasted from clipboard'); } else say('Clipboard is empty');
+    }, function () { text.focus(); text.select(); say('Press Ctrl+V / Cmd+V to replace the selected text'); });
+  };
+  $('open').onchange = function (e) {
+    var f = e.target.files[0]; if (!f) return;
+    readFile(f, false, function (t) { setText(t); say('Opened ' + f.name); });
+    e.target.value = '';
+  };
+  $('save').onclick = function () {
+    var name = (CV.parse(text.value).name || 'cv').replace(/[^\w\- ]+/g, '').trim().replace(/\s+/g, '_');
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text.value], { type: 'text/plain;charset=utf-8' }));
+    a.download = name + '_CV.txt';
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  };
+  $('photo').onchange = function (e) {
+    var f = e.target.files[0]; if (!f) return;
+    readFile(f, true, setPhoto);
+    e.target.value = '';
+  };
+  $('nophoto').onclick = function () { photo = ''; store(KEY_PHOTO, ''); update(); };
+  $('helpbtn').onclick = function () { $('help').classList.toggle('open'); };
+  $('example').onclick = function () {
+    if (text.value.trim() && !confirm('Replace your text with the example? (Save it first if you want to keep it.)')) return;
+    setText($('example-text').textContent);
+  };
+
+  // Drop a .txt or an image anywhere on the page.
+  document.addEventListener('dragover', function (e) { e.preventDefault(); });
+  document.addEventListener('drop', function (e) {
+    e.preventDefault();
+    var f = e.dataTransfer.files[0]; if (!f) return;
+    if (/^image\//.test(f.type)) readFile(f, true, setPhoto);
+    else readFile(f, false, function (t) { setText(t); say('Opened ' + f.name); });
+  });
+
+  photo = load(KEY_PHOTO);
+  setText(load(KEY_TEXT) || $('example-text').textContent);
+  if (document.fonts) document.fonts.ready.then(update);
+})();
+</script>
+</body>
+</html>

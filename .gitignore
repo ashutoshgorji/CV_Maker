@@ -1,0 +1,6 @@
+node_modules/
+.render-tmp.html
+# Personal files stay on your computer (the repo is public)
+my-*
+*.pdf
+photo.*

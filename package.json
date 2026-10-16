@@ -1,0 +1,12 @@
+{
+  "name": "cv-maker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Write your CV as plain text, get a PDF in the FlowCV PT Serif layout",
+  "scripts": {
+    "pdf": "node make-pdf.js"
+  },
+  "dependencies": {
+    "playwright": "^1.56.1"
+  }
+}
